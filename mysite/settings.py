@@ -12,25 +12,25 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
-
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+load_dotenv(os.path.join(BASE_DIR,".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rc^*w^w&6g9_(uvx#6s*bnt!w)l0rdi%!l7mv#y%uc&x%wo5pk'
-
+SECRET_KEY=os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
 # FORM SUBMISSION
 # Comment out the following line and place your railway URL, and your production URL in the array.
 # CSRF_TRUSTED_ORIGINS = ["*"]
+# Add this line of code to prevent error caused by Django 40 version about trusted origins 
+CSRF_TRUSTED_ORIGINS=['https://mysite-django-production.up.railway.app']
 
 # Application definition
 
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'publicaciones',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +60,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,7 +78,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -88,7 +89,16 @@ DATABASES = {
         'PORT': os.environ["PGPORT"],
     }
 }
+'''
+#update this line of code, because its needed for the PostgreSQL database to function properly
+DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
 
+#This lines helps to link your database details 
+import dj_database_url
+DATABASE_URL=os.getenv("DATABASE_URL")
+DATABASES={
+    "default":dj_database_url.config(default=DATABASE_URL,conn_max_age=1800),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -131,4 +141,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
